@@ -1,0 +1,51 @@
+version: "3"
+services:
+
+  workspace:
+    build: ./workspace
+    container_name: workspace
+    volumes:
+      - ./../:/var/www/html/workspace
+    tty: true
+
+  mysql:
+    restart: always
+    image: 'bitnami/mysql:5.7'
+    container_name: mysql
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_DATABASE=laravel
+    volumes:
+      - 'mysql_data:/bitnami/mysql/data'
+    ports:
+      - "3306:3306"
+
+  nginx:
+    restart: always
+    build: nginx
+    container_name: nginx_front
+    volumes:
+      - ./../:/var/www/html
+    ports:
+      - "80:80"
+
+  php-fpm:
+    restart: always
+    build: php-fpm
+    container_name: fpm_front
+    volumes:
+      - ./../:/var/www/html
+
+  redis:
+    restart: always
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
+
+
+volumes:
+  mysql_data: {}
